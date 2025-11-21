@@ -1,0 +1,39 @@
+name: TicketBlast CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Job 1: Verifica se o código TypeScript está saudável
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Dependencies
+      run: npm ci
+
+    # Esse passo garante que não tem erro de sintaxe ou tipagem
+    - name: TypeScript Build
+      run: npm run build
+
+  # Job 2: Verifica se a Infraestrutura (Docker) está saudável
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: code-quality # Só roda se o código estiver bom
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Tenta buildar os containers para ver se o Dockerfile/Compose não tem erro
+    - name: Build Docker Images
+      run: docker compose build
