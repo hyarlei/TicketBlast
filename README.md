@@ -1,5 +1,7 @@
 # TicketBlast - High Performance Ticket System 🎫
 
+[![TicketBlast CI](https://github.com/hyarlei/TicketBlast/actions/workflows/ci.yml/badge.svg)](https://github.com/hyarlei/TicketBlast/actions/workflows/ci.yml)
+
 Uma prova de conceito (PoC) de um sistema de venda de ingressos de alta concorrência, projetado para lidar com picos de tráfego (ex: vendas do Rock in Rio) sem derrubar o banco de dados.
 
 ## 🏗 Arquitetura
