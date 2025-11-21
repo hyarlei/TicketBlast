@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # 1. Banco de Dados Relacional
+  postgres:
+    image: postgres:alpine
+    container_name: ticketblast_db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=ticketblast
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # 2. Sistema de Cache
+  redis:
+    image: redis:alpine
+    container_name: ticketblast_redis
+    ports:
+      - "6379:6379"
+
+  # 3. Sistema de Filas (Mensageria)
+  rabbitmq:
+    image: rabbitmq:3-management # A tag 'management' já vem com o painel visual!
+    container_name: ticketblast_rabbitmq
+    ports:
+      - "5672:5672"   # Porta para o código conectar
+      - "15672:15672" # Porta para você acessar o painel no navegador
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+
+volumes:
+  pgdata:
