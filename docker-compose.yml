@@ -32,5 +32,20 @@ services:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
 
+  # 4. Simulador AWS (LocalStack)
+  localstack:
+    image: localstack/localstack
+    container_name: ticketblast_aws
+    ports:
+      - "4566:4566"            # Porta padrão da AWS Fake
+      - "4510-4559:4510-4559"  # Portas de serviços extras
+    environment:
+      - SERVICES=s3            # Só queremos simular o S3 por enquanto
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - "./.localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
 volumes:
   pgdata:
