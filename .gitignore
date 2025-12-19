@@ -7,3 +7,5 @@ node_modules/
 kubectl
 minikube-linux-amd64minikube-linux-amd64
 kubectl
+minikube-linux-amd64
+kubectl
