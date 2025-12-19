@@ -3,3 +3,7 @@
 
 # Node modules
 node_modules/
+# Kubernetes binaries
+kubectl
+minikube-linux-amd64minikube-linux-amd64
+kubectl

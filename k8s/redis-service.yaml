@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service # Esse será o "nome de host" dentro do cluster
+spec:
+  selector:
+    app: redis # Conecta esse serviço aos pods com label "redis"
+  ports:
+    - protocol: TCP
+      port: 6379       # Porta exposta para outros serviços
+      targetPort: 6379 # Porta do container
