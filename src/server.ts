@@ -29,9 +29,9 @@ async function startServer() {
       try {
         const estoqueRestante = await redisClient.decr('ingressos_disponíveis');
         
-        if (estoqueRestante < -100) {
-           console.log(`[API] Compra negada para ${name}. Estoque: ${estoqueRestante}`);
-        }
+        // if (estoqueRestante < -100) {
+        //    console.log(`[API] Compra negada para ${name}. Estoque: ${estoqueRestante}`);
+        // }
 
         const order = {
           orderId: Math.floor(Math.random() * 10000),
