@@ -2,10 +2,12 @@ import express from 'express';
 import amqp from 'amqplib';
 import dotenv from 'dotenv';
 import redisClient from './redis';
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 const QUEUE_NAME = 'fila_ingressos';
@@ -19,12 +21,7 @@ async function startServer() {
     app.post('/buy-ticket', async (req, res) => {
       const { name, email, ticketType } = req.body;
 
-      // 1. CHECAGEM DE ESTOQUE NO REDIS
-      // O comando 'decr' diminui o valor em 1 e retorna o novo valor.
-      // É uma operação "atômica" (segura contra concorrência).
       const estoqueRestante = await redisClient.decr('ingressos_disponiveis');
-
-      // Se o estoque ficou negativo, significa que acabou
       if (estoqueRestante < 0) {
         console.log(`[API] Compra negada para ${name}. Estoque esgotado!`);
         return res.status(400).json({ message: 'Ingressos esgotados! 😢' });
