@@ -11,5 +11,5 @@
     "rootDir": "./src"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "web"]  // 👈 ADICIONE ESTA LINHA
+  "exclude": ["node_modules", "web"]
 }
