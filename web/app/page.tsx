@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const API_URL = "http://192.168.49.2:30000";
+const API_URL = "https://ticketblast-api.onrender.com";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
