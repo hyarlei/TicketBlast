@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2016",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -9,5 +9,7 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src"
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "web"]  // 👈 ADICIONE ESTA LINHA
 }
