@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+spec:
+  replicas: 1 # Quer escalar? Mude para 2 ou 3 depois!
+  selector:
+    matchLabels:
+      app: ticketblast-worker
+  template:
+    metadata:
+      labels:
+        app: ticketblast-worker
+    spec:
+      containers:
+      - name: worker
+        image: ticketblast:v1
+        imagePullPolicy: Never
+        command: ["node", "dist/worker.js"] # Roda o Worker compilado
+        envFrom:
+        - configMapRef:
+            name: ticketblast-config

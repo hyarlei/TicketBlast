@@ -26,7 +26,7 @@ services:
     image: rabbitmq:3-management # A tag 'management' já vem com o painel visual!
     container_name: ticketblast_rabbitmq
     ports:
-      - "5672:5672"   # Porta para o código conectar
+      - "5672:5672" # Porta para o código conectar
       - "15672:15672" # Porta para você acessar o painel no navegador
     environment:
       - RABBITMQ_DEFAULT_USER=admin
@@ -37,12 +37,13 @@ services:
     image: localstack/localstack
     container_name: ticketblast_aws
     ports:
-      - "4566:4566"            # Porta padrão da AWS Fake
-      - "4510-4559:4510-4559"  # Portas de serviços extras
+      - "0.0.0.0:4566:4566" # <--- Força ouvir em todos os IPs (incluindo o 192...)
+      - "0.0.0.0:4510-4559:4510-4559" # <--- Mesma coisa aqui
     environment:
-      - SERVICES=s3            # Só queremos simular o S3 por enquanto
+      - SERVICES=s3
       - DEBUG=1
       - DATA_DIR=/tmp/localstack/data
+      - GATEWAY_LISTEN=0.0.0.0:4566 # <--- Variável importante do LocalStack
     volumes:
       - "./.localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"

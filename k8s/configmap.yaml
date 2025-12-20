@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ticketblast-config
+data:
+  # Configurações de Rede Interna do Cluster
+  RABBITMQ_URL: "amqp://admin:admin@rabbitmq-service:5672"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  
+  # Hack para acessar o LocalStack que está FORA do cluster (no seu Docker)
+  AWS_ENDPOINT: "http://192.168.1.40:4566"
+  AWS_REGION: "us-east-1"
+  AWS_BUCKET: "ingressos-bucket"
