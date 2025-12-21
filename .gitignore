@@ -9,3 +9,5 @@ minikube-linux-amd64minikube-linux-amd64
 kubectl
 minikube-linux-amd64
 kubectl
+
+/src/generated/prisma

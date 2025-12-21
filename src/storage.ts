@@ -27,7 +27,7 @@ export const uploadPdf = async (filename: string, fileBuffer: Buffer) => {
   try {
     try {
       await s3Client.send(new CreateBucketCommand({ Bucket: awsBucket }));
-    } catch (error: any) { }
+    } catch (error: any) {}
 
     const command = new PutObjectCommand({
       Bucket: awsBucket,
@@ -38,8 +38,8 @@ export const uploadPdf = async (filename: string, fileBuffer: Buffer) => {
 
     await s3Client.send(command);
 
-    if (awsEndpoint.includes('supabase.co')) {
-      const publicEndpoint = awsEndpoint.replace('/s3', '/object/public');
+    if (awsEndpoint.includes("supabase.co")) {
+      const publicEndpoint = awsEndpoint.replace("/s3", "/object/public");
       return `${publicEndpoint}/${awsBucket}/${filename}`;
     }
 

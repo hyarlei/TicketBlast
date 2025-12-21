@@ -2,6 +2,7 @@ import amqp from "amqplib";
 import dotenv from "dotenv";
 import PDFDocument from "pdfkit";
 import { uploadPdf } from "./storage";
+import prisma from "./lib/prisma.config";
 
 dotenv.config();
 
@@ -49,6 +50,14 @@ export const startWorker = async () => {
         const s3Url = await uploadPdf(fileName, pdfBuffer);
 
         console.log(`✅ [SUCESSO] PDF Salvo: ${s3Url}`);
+
+        await prisma.ticket.updateMany({
+          where: { orderId: order.orderId },
+          data: { status: "COMPLETED" },
+        });
+        console.log(
+          `✅ [SUCESSO] Pedido ${order.orderId} atualizado no banco de dados.`
+        );
 
         channel.ack(msg);
       } catch (error) {

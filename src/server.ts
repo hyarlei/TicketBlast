@@ -1,9 +1,10 @@
-import express from 'express';
-import amqp from 'amqplib';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import redisClient from './redis';
-import { startWorker } from './worker';
+import express from "express";
+import amqp from "amqplib";
+import dotenv from "dotenv";
+import cors from "cors";
+import redisClient from "./redis";
+import { startWorker } from "./worker";
+import prisma from "./lib/prisma.config"
 
 dotenv.config();
 
@@ -11,48 +12,66 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const QUEUE_NAME = 'fila_ingressos';
+const QUEUE_NAME = "fila_ingressos";
 
-startWorker().catch(err => console.error('❌ Erro fatal ao iniciar worker embutido:', err));
+startWorker().catch((err) =>
+  console.error("❌ Erro fatal ao iniciar worker embutido:", err)
+);
 
 async function startServer() {
   try {
-    const rabbitUrl = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
+    const rabbitUrl =
+      process.env.RABBITMQ_URL || "amqp://admin:admin@localhost:5672";
     const connection = await amqp.connect(rabbitUrl);
     const channel = await connection.createChannel();
-    
+
     await channel.assertQueue(QUEUE_NAME, { durable: true });
 
-    app.post('/buy-ticket', async (req, res) => {
+    app.post("/buy-ticket", async (req, res) => {
       const { name, email, ticketType } = req.body;
 
       try {
-        const estoqueRestante = await redisClient.decr('ingressos_disponíveis');
-        
-        // if (estoqueRestante < -100) {
-        //    console.log(`[API] Compra negada para ${name}. Estoque: ${estoqueRestante}`);
-        // }
+        const estoqueRestante = await redisClient.decr("ingressos_disponíveis");
+
+        const orderId = Math.floor(Math.random() * 10000);
+
+        try {
+          await prisma.ticket.create({
+            data: {
+              orderId: orderId,
+              name: name,
+              email: email,
+              type: ticketType,
+              status: "PENDING",
+            },
+          });
+          console.log(`[DB] Pedido ${orderId} salvo no banco.`);
+        } catch (dbErr) {
+          console.error(
+            "⚠️ Erro ao salvar pedido no banco (mas seguindo com a fila):",
+            dbErr
+          );
+        }
 
         const order = {
-          orderId: Math.floor(Math.random() * 10000),
+          orderId,
           name,
           email,
           ticketType,
-          date: new Date().toISOString()
+          date: new Date().toISOString(),
         };
 
         channel.sendToQueue(QUEUE_NAME, Buffer.from(JSON.stringify(order)));
 
         console.log(`[API] Pedido ${order.orderId} enviado para a fila!`);
 
-        return res.status(202).json({ 
-          message: 'Pedido em processamento!',
-          orderId: order.orderId
+        return res.status(202).json({
+          message: "Pedido em processamento!",
+          orderId: order.orderId,
         });
-
       } catch (err) {
-        console.error('Erro na rota:', err);
-        return res.status(500).json({ message: 'Erro interno no servidor' });
+        console.error("Erro na rota:", err);
+        return res.status(500).json({ message: "Erro interno no servidor" });
       }
     });
 
@@ -61,9 +80,8 @@ async function startServer() {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`🐰 API conectada na fila: ${QUEUE_NAME}`);
     });
-
   } catch (error) {
-    console.error('❌ Erro fatal ao iniciar servidor:', error);
+    console.error("❌ Erro fatal ao iniciar servidor:", error);
   }
 }
 
