@@ -6,6 +6,7 @@ import redisClient from "./redis"
 import { startWorker } from "./worker"
 import prisma from "./lib/prisma.config"
 import { ticketSchema } from "./schemas/ticketSchema"
+import { rateLimiterMiddleware } from "./middlewares/rateLimiter"
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ async function startServer() {
 
     await channel.assertQueue(QUEUE_NAME, { durable: true });
 
-    app.post("/buy-ticket", async (req, res) => {
+    app.post("/buy-ticket", rateLimiterMiddleware, async (req, res) => {
       const validation = ticketSchema.safeParse(req.body);
       if (!validation.success) {
         return res.status(400).json({
