@@ -63,7 +63,7 @@ export const startWorker = async () => {
 
         await resend.emails.send({
           from: "onboarding@resend.dev",
-          to: order.email,
+          to: "hyarlei@alu.ufc.br",
           subject: `Seu ingresso para o TicketBlast chegou! 🎟️`,
           html: `
             <h1>Olá, ${order.name}!</h1>
