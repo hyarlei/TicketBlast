@@ -3,8 +3,11 @@ import dotenv from "dotenv";
 import PDFDocument from "pdfkit";
 import { uploadPdf } from "./storage";
 import prisma from "./lib/prisma.config";
+import { Resend } from "resend";
 
 dotenv.config();
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const QUEUE_NAME = "fila_ingressos";
 
@@ -55,10 +58,29 @@ export const startWorker = async () => {
           where: { orderId: order.orderId },
           data: { status: "COMPLETED" },
         });
-        console.log(
-          `✅ [SUCESSO] Pedido ${order.orderId} atualizado no banco de dados.`
-        );
 
+        console.log(`📧 Enviando e-mail para ${order.email}...`);
+
+        await resend.emails.send({
+          from: "onboarding@resend.dev",
+          to: "hyarlei@alu.ufc.br",
+          subject: `Seu ingresso para o TicketBlast chegou! 🎟️`,
+          html: `
+            <h1>Olá, ${order.name}!</h1>
+            <p>Seu pedido <strong>#${order.orderId}</strong> foi processado com sucesso.</p>
+            <p>Seu ingresso está em anexo e também pode ser baixado clicando <a href="${s3Url}">aqui</a>.</p>
+            <br>
+            <p><em>Equipe TicketBlast 🚀</em></p>
+          `,
+          attachments: [
+            {
+              filename: fileName,
+              content: pdfBuffer,
+            },
+          ],
+        });
+
+        console.log(`✅ [E-MAIL] Enviado com sucesso!`);
         channel.ack(msg);
       } catch (error) {
         console.error("❌ Erro ao processar:", error);
