@@ -1,33 +1,27 @@
 import { google } from "@ai-sdk/google";
-import { streamText } from "ai";
+import { generateText } from "ai";
 
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  try {
+    const { message } = await req.json();
 
-  const result = await streamText({
-    model: google("gemini-1.5-flash"),
-    system: `Você é o assistente virtual do TicketBlast, um sistema de venda de ingressos.
-    
-    Informações do evento:
-    - Nome: Tech Conference 2025
-    - Data: 20 de Dezembro de 2025
-    - Local: Centro de Eventos do Ceará
-    
-    Preços:
-    - Pista (Comum): R$ 100,00
-    - VIP (Frontstage + Open Bar): R$ 300,00
-    
-    Regras:
-    - Ingressos são enviados por e-mail em PDF.
-    - É necessário apresentar documento com foto.
-    - Menores de 18 anos apenas acompanhados.
-    
-    Seja simpático, use emojis e ajude o usuário a decidir qual ingresso comprar.
-    Se perguntarem algo fora desse contexto, diga gentilmente que só sabe falar sobre o TicketBlast.`,
-    messages,
-  });
+    const { text } = await generateText({
+      model: google("gemini-flash-latest"),
+      system: `Você é o suporte do TicketBlast. 
+      Seja curto, educado e use emojis.
+      Preços: VIP R$300, Pista R$100.
+      Data: 20/12/2025.`,
+      prompt: message,
+    });
 
-  return result.toTextStreamResponse();
+    return Response.json({ text });
+  } catch (error) {
+    console.error("Erro no Gemini:", error);
+    return Response.json(
+      { text: "Desculpe, tive um erro no sistema. Tente novamente." },
+      { status: 500 }
+    );
+  }
 }
