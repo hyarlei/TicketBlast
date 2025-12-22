@@ -1,51 +1,32 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  CreateBucketCommand,
-} from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
+import { createClient } from "@supabase/supabase-js";
 
 dotenv.config();
 
-const awsEndpoint = process.env.AWS_ENDPOINT || "http://localhost:4566";
-const awsRegion = process.env.AWS_REGION || "us-east-2";
-const awsAccessKey = process.env.AWS_ACCESS_KEY_ID || "test";
-const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY || "test";
-const awsBucket = process.env.AWS_BUCKET || "ingressos-bucket";
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_KEY || "";
 
-const s3Client = new S3Client({
-  region: awsRegion,
-  endpoint: awsEndpoint,
-  forcePathStyle: true,
-  credentials: {
-    accessKeyId: awsAccessKey,
-    secretAccessKey: awsSecretKey,
-  },
-});
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-export const uploadPdf = async (filename: string, fileBuffer: Buffer) => {
-  try {
-    try {
-      await s3Client.send(new CreateBucketCommand({ Bucket: awsBucket }));
-    } catch (error: any) {}
-
-    const command = new PutObjectCommand({
-      Bucket: awsBucket,
-      Key: filename,
-      Body: fileBuffer,
-      ContentType: "application/pdf",
+export async function uploadPdf(fileName: string, pdfBuffer: Buffer): Promise<string> {
+  const { error: uploadError } = await supabase.storage
+    .from('ingressos-bucket')
+    .upload(fileName, pdfBuffer, {
+      contentType: 'application/pdf',
+      upsert: true,
     });
 
-    await s3Client.send(command);
-
-    if (awsEndpoint.includes("supabase.co")) {
-      const publicEndpoint = awsEndpoint.replace("/s3", "/object/public");
-      return `${publicEndpoint}/${awsBucket}/${filename}`;
-    }
-
-    return `${awsEndpoint}/${awsBucket}/${filename}`;
-  } catch (error) {
-    console.error("❌ Erro no upload S3:", error);
-    throw error;
+  if (uploadError) {
+    throw new Error(`Erro no upload: ${uploadError.message}`);
   }
-};
+
+  const { data, error: urlError } = await supabase.storage
+    .from('ingressos-bucket')
+    .createSignedUrl(fileName, 3600);
+
+  if (urlError || !data?.signedUrl) {
+    throw new Error(`Erro ao gerar URL assinada: ${urlError?.message}`);
+  }
+
+  return data.signedUrl;
+}
