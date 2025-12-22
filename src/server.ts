@@ -1,10 +1,11 @@
-import express from "express";
-import amqp from "amqplib";
-import dotenv from "dotenv";
-import cors from "cors";
-import redisClient from "./redis";
-import { startWorker } from "./worker";
+import express from "express"
+import amqp from "amqplib"
+import dotenv from "dotenv"
+import cors from "cors"
+import redisClient from "./redis"
+import { startWorker } from "./worker"
 import prisma from "./lib/prisma.config"
+import { ticketSchema } from "./schemas/ticketSchema"
 
 dotenv.config();
 
@@ -28,10 +29,18 @@ async function startServer() {
     await channel.assertQueue(QUEUE_NAME, { durable: true });
 
     app.post("/buy-ticket", async (req, res) => {
-      const { name, email, ticketType } = req.body;
+      const validation = ticketSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({
+          message: "Dados inválidos",
+          details: validation.error.format()
+        });
+      }
+
+      const { name, email, ticketType } = validation.data;
 
       try {
-        const estoqueRestante = await redisClient.decr("ingressos_disponíveis");
+        await redisClient.decr("ingressos_disponíveis");
 
         const orderId = Math.floor(Math.random() * 10000);
 
