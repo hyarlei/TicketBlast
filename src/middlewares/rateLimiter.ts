@@ -6,7 +6,7 @@ const rateLimiter = new RateLimiterRedis({
   storeClient: redisClient,
   keyPrefix: 'middleware',
   points: 3,
-  duration: 60,
+  duration: 10,
 });
 
 export const rateLimiterMiddleware = (req: Request, res: Response, next: NextFunction) => {
