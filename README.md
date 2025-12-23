@@ -1,6 +1,6 @@
 # TicketBlast - Plataforma de Ingressos com IA e Processamento Assíncrono
 
-![TicketBlast Banner](https://via.placeholder.com/1200x400?text=TicketBlast+Project+Banner)
+![TicketBlast](./web/public/img/Gemini_Generated_Image_n5k0ssn5k0ssn5k0.png)
 ![Next.js 15](https://img.shields.io/badge/Next.js_15-black?style=for-the-badge&logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
