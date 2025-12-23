@@ -42,26 +42,12 @@ Diferente de um CRUD simples, este projeto foca em **User Experience (UX)** e **
 - **AI SDK:** Vercel AI SDK + Google Generative AI
 - **Deploy:** Render (Node.js Service)
 
----
+### Monitoramento e Qualidade
 
-## Desafios de Engenharia & Soluções
-
-Este projeto foi um laboratório de resolução de problemas reais de infraestrutura:
-
-### 1. Connection Pooling em Ambiente Serverless
-
-**O Problema:** Ao realizar o deploy, enfrentei erros de `prepared statement already exists` e exaustão de conexões no PostgreSQL, causados pela natureza efêmera das funções serverless/containers.
-**A Solução:** Configuração do **PgBouncer** em modo _Transaction_ no Supabase e ajuste na string de conexão do Prisma (`pgbouncer=true`), estabilizando a comunicação com o banco.
-
-### 2. Latência na Geração de Ingressos
-
-**O Problema:** A geração de PDF e upload síncrono fazia o checkout demorar +5 segundos.
-**A Solução:** Implementação de arquitetura de filas (Producer/Consumer). O usuário recebe a confirmação imediata na tela, enquanto um _Worker_ processa o PDF e o e-mail em segundo plano.
-
-### 3. Integração com LLMs (IA)
-
-**O Problema:** Gerenciar cotas de API e versionamento de modelos (_Model Not Found_ / _429 Too Many Requests_).
-**A Solução:** Implementação de tratamento de erros robusto e fallback, utilizando modelos Flash otimizados para latência baixa.
+- **Sentry:** Para monitoramento de erros em tempo real e performance (tracing)
+- **Jest:** Para testes unitários automatizados
+- **Zod:** Para validação rigorosa de dados (Schema Validation)
+- **GitHub Actions:** Para integração contínua (CI/CD)
 
 ---
 
@@ -114,6 +100,27 @@ graph LR
     style RabbitMQ fill:#FF6600,stroke:#333,color:#fff
     style API fill:#68A063,stroke:#333,color:#fff
 ```
+
+---
+
+## Desafios de Engenharia & Soluções
+
+Este projeto foi um laboratório de resolução de problemas reais de infraestrutura:
+
+### 1. Connection Pooling em Ambiente Serverless
+
+**O Problema:** Ao realizar o deploy, enfrentei erros de `prepared statement already exists` e exaustão de conexões no PostgreSQL, causados pela natureza efêmera das funções serverless/containers.
+**A Solução:** Configuração do **PgBouncer** em modo _Transaction_ no Supabase e ajuste na string de conexão do Prisma (`pgbouncer=true`), estabilizando a comunicação com o banco.
+
+### 2. Latência na Geração de Ingressos
+
+**O Problema:** A geração de PDF e upload síncrono fazia o checkout demorar +5 segundos.
+**A Solução:** Implementação de arquitetura de filas (Producer/Consumer). O usuário recebe a confirmação imediata na tela, enquanto um _Worker_ processa o PDF e o e-mail em segundo plano.
+
+### 3. Integração com LLMs (IA)
+
+**O Problema:** Gerenciar cotas de API e versionamento de modelos (_Model Not Found_ / _429 Too Many Requests_).
+**A Solução:** Implementação de tratamento de erros robusto e fallback, utilizando modelos Flash otimizados para latência baixa.
 
 ---
 
