@@ -16,7 +16,7 @@ export const rateLimiterMiddleware = (req: Request, res: Response, next: NextFun
     })
     .catch(() => {
       res.status(429).json({
-        message: '⛔ Muitas tentativas! Tente novamente em 1 minuto.',
+        message: 'Muitas tentativas! Tente novamente em 1 minuto.',
         error: 'Too Many Requests'
       });
     });

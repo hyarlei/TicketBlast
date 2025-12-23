@@ -18,13 +18,13 @@ app.use(express.json());
 const QUEUE_NAME = "fila_ingressos";
 
 startWorker().catch((err) =>
-  console.error("❌ Erro fatal ao iniciar worker embutido:", err)
+  console.error("Erro fatal ao iniciar worker embutido:", err)
 );
 
 async function startServer() {
   try {
     const rabbitUrl =
-      process.env.RABBITMQ_URL || "amqp://admin:admin@localhost:5672";
+      process.env.RABBITMQ_URL || "";
     const connection = await amqp.connect(rabbitUrl);
     const channel = await connection.createChannel();
 
@@ -59,7 +59,7 @@ async function startServer() {
           console.log(`[DB] Pedido ${orderId} salvo no banco.`);
         } catch (dbErr) {
           console.error(
-            "⚠️ Erro ao salvar pedido no banco (mas seguindo com a fila):",
+            "Erro ao salvar pedido no banco (mas seguindo com a fila):",
             dbErr
           );
         }
@@ -88,11 +88,11 @@ async function startServer() {
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`🐰 API conectada na fila: ${QUEUE_NAME}`);
+      console.log(`Server running on port ${PORT}`);
+      console.log(`API conectada na fila: ${QUEUE_NAME}`);
     });
   } catch (error) {
-    console.error("❌ Erro fatal ao iniciar servidor:", error);
+    console.error("Erro fatal ao iniciar servidor:", error);
   }
 }
 
