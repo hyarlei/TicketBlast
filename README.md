@@ -65,7 +65,7 @@ Este projeto foi um laboratório de resolução de problemas reais de infraestru
 
 ---
 
-## 📊 Diagrama de Arquitetura
+## Diagrama de Arquitetura
 
 ```mermaid
 graph LR
