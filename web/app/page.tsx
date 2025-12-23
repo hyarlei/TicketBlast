@@ -5,10 +5,26 @@ import Chatbot from "./components/Chatbot";
 
 const API_URL = "https://ticketblast-api.onrender.com";
 
+type Notification = {
+  id: number;
+  message: string;
+  type: "success" | "error";
+};
+
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [ticketUrl, setTicketUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const showNotification = (message: string, type: "success" | "error") => {
+    const id = Date.now();
+    setNotifications((prev) => [...prev, { id, message, type }]);
+
+    setTimeout(() => {
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+    }, 5000);
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -33,9 +49,17 @@ export default function Home() {
 
       await new Promise((r) => setTimeout(r, 2000));
 
-      alert("Pedido enviado! O Worker está processando.");
+      showNotification(
+        "🎉 Pedido enviado! O Worker está processando seu ingresso.",
+        "success"
+      );
+      e.target.reset(); // Limpa o formulário
     } catch (err) {
       setError("Erro ao conectar com o servidor.");
+      showNotification(
+        "❌ Erro ao conectar com o servidor. Tente novamente.",
+        "error"
+      );
       console.error(err);
     } finally {
       setLoading(false);
@@ -44,6 +68,25 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-slate-900 text-white p-4">
+      {/* Notifications Container */}
+      <div className="fixed top-4 left-4 z-50 space-y-2">
+        {notifications.map((notif) => (
+          <div
+            key={notif.id}
+            className={`
+              min-w-75 p-4 rounded-lg shadow-2xl border
+              animate-slide-in-left
+              ${notif.type === "success"
+                ? "bg-green-900/90 border-green-600 text-green-100"
+                : "bg-red-900/90 border-red-600 text-red-100"
+              }
+            `}
+          >
+            <p className="text-sm font-medium">{notif.message}</p>
+          </div>
+        ))}
+      </div>
+
       <div className="max-w-md w-full bg-slate-800 p-8 rounded-2xl shadow-2xl border border-slate-700">
         <h1 className="text-4xl font-bold text-center mb-2 text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-pink-600">
           TicketBlast 🚀
