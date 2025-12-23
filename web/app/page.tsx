@@ -16,6 +16,7 @@ export default function Home() {
   const [ticketUrl, setTicketUrl] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [ticketType, setTicketType] = useState<"VIP" | "COMUM">("VIP");
 
   const showNotification = (message: string, type: "success" | "error") => {
     const id = Date.now();
@@ -35,7 +36,7 @@ export default function Home() {
     const formData = {
       name: e.target.name.value,
       email: e.target.email.value,
-      ticketType: "VIP",
+      ticketType: ticketType,
     };
 
     try {
@@ -120,12 +121,28 @@ export default function Home() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Tipo de Ingresso
+            </label>
+            <select
+              name="ticketType"
+              value={ticketType}
+              onChange={(e) => setTicketType(e.target.value as "VIP" | "COMUM")}
+              required
+              className="w-full p-3 rounded-lg bg-slate-900 border border-slate-600 focus:border-purple-500 focus:outline-none transition cursor-pointer"
+            >
+              <option value="VIP">VIP - Acesso Premium</option>
+              <option value="COMUM">COMUM - Acesso Padrão</option>
+            </select>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
             className="w-full py-3 px-4 bg-linear-to-r from-purple-600 to-pink-600 rounded-lg font-bold text-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Processando..." : "Comprar Ingresso VIP"}
+            {loading ? "Processando..." : `Comprar Ingresso ${ticketType}`}
           </button>
         </form>
 
