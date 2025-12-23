@@ -65,6 +65,58 @@ Este projeto foi um laboratório de resolução de problemas reais de infraestru
 
 ---
 
+## 📊 Diagrama de Arquitetura
+
+```mermaid
+graph LR
+    User([👤 Usuário])
+
+    subgraph Frontend [🎨 Frontend]
+        NextJS[Next.js 15<br/>App Router]
+    end
+
+    subgraph AI [🤖 Inteligência Artificial]
+        Gemini[Google Gemini 2.0<br/>Chatbot de Suporte]
+    end
+
+    subgraph Backend [🔧 Backend API]
+        API[Express API<br/>+ Prisma ORM]
+    end
+
+    subgraph Queue [⚡ Processamento Assíncrono]
+        RabbitMQ[[RabbitMQ<br/>Message Queue]]
+        Worker[Worker Node.js<br/>Gera PDF + Envia Email]
+    end
+
+    subgraph Database [💾 Banco de Dados]
+        Supabase[(PostgreSQL<br/>Supabase + PgBouncer)]
+        Redis[(Redis<br/>Cache + Rate Limit)]
+    end
+
+    %% Fluxo Principal
+    User -->|1. Compra Ingresso| NextJS
+    User <-->|Chat em Tempo Real| Gemini
+    NextJS -->|2. HTTP POST| API
+    API <-->|Consultas via Prisma| Supabase
+    API <-->|Rate Limiting| Redis
+    
+    %% Fluxo Assíncrono (O Pulo do Gato)
+    API -->|3. Envia Job| RabbitMQ
+    RabbitMQ -->|4. Consome Tarefa| Worker
+    Worker -->|5. Atualiza Status| Supabase
+    Worker -.->|6. Email + PDF| User
+
+    %% Estilos
+    style NextJS fill:#000,stroke:#fff,color:#fff
+    style Supabase fill:#3ECF8E,stroke:#333,color:#fff
+    style Gemini fill:#8E75B2,stroke:#333,color:#fff
+    style Redis fill:#DC382D,stroke:#333,color:#fff
+    style RabbitMQ fill:#FF6600,stroke:#333,color:#fff
+    style API fill:#68A063,stroke:#333,color:#fff
+```
+
+---
+
 ## Como Rodar Localmente
 
 ### Pré-requisitos
@@ -77,40 +129,40 @@ Este projeto foi um laboratório de resolução de problemas reais de infraestru
 
 1. **Clone o repositório:**
 
-    ```bash
-    git clone [https://github.com/seu-usuario/TicketBlast.git](https://github.com/seu-usuario/TicketBlast.git)
-    cd TicketBlast/web
-    ```
+   ```bash
+   git clone [https://github.com/seu-usuario/TicketBlast.git](https://github.com/seu-usuario/TicketBlast.git)
+   cd TicketBlast/web
+   ```
 
 2. **Instale as dependências:**
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
 3. **Configure as Variáveis de Ambiente:**
-    Crie um arquivo `.env` na raiz baseado no exemplo abaixo:
+   Crie um arquivo `.env` na raiz baseado no exemplo abaixo:
 
-    ```env
-    DATABASE_URL="sua_string_supabase_connection_pooling"
-    DIRECT_URL="sua_string_supabase_direct"
-    GOOGLE_GENERATIVE_AI_API_KEY="sua_chave_gemini"
-    REDIS_URL="sua_url_redis"
-    ```
+   ```env
+   DATABASE_URL="sua_string_supabase_connection_pooling"
+   DIRECT_URL="sua_string_supabase_direct"
+   GOOGLE_GENERATIVE_AI_API_KEY="sua_chave_gemini"
+   REDIS_URL="sua_url_redis"
+   ```
 
 4. **Rode as migrações do Banco:**
 
-    ```bash
-    npx prisma migrate dev
-    ```
+   ```bash
+   npx prisma migrate dev
+   ```
 
 5. **Inicie o Servidor de Desenvolvimento:**
 
-    ```bash
-    npm run dev
-    ```
+   ```bash
+   npm run dev
+   ```
 
-    Acesse `http://localhost:3000`.
+   Acesse `http://localhost:3000`.
 
 ---
 
