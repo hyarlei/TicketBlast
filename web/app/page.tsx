@@ -46,19 +46,42 @@ export default function Home() {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) throw new Error("Falha ao comprar ingresso");
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 400 && data.details) {
+          const errorMessages = Object.entries(data.details)
+            .filter(([key]) => key !== "_errors")
+            .map(([field, error]: [string, any]) => {
+              const fieldName = field === "name" ? "Nome" : field === "email" ? "E-mail" : "Tipo de ingresso";
+              return `${fieldName}: ${error._errors.join(", ")}`;
+            })
+            .join("\n");
+          
+          const errorMsg = errorMessages || data.message || "Dados inválidos";
+          setError(errorMsg);
+          showNotification(`${errorMsg}`, "error");
+          return;
+        }
+        
+        const errorMsg = data.message || "Falha ao comprar ingresso";
+        setError(errorMsg);
+        showNotification(`${errorMsg}`, "error");
+        return;
+      }
 
       await new Promise((r) => setTimeout(r, 2000));
 
       showNotification(
-        "🎉 Pedido enviado! O Worker está processando seu ingresso.",
+        "Pedido enviado! O Worker está processando seu ingresso.",
         "success"
       );
-      e.target.reset(); // Limpa o formulário
+      e.target.reset();
+      setTicketType("VIP");
     } catch (err) {
       setError("Erro ao conectar com o servidor.");
       showNotification(
-        "❌ Erro ao conectar com o servidor. Tente novamente.",
+        "Erro ao conectar com o servidor. Tente novamente.",
         "error"
       );
       console.error(err);
@@ -69,7 +92,6 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-slate-900 text-white p-4">
-      {/* Notifications Container */}
       <div className="fixed top-4 left-4 z-50 space-y-2">
         {notifications.map((notif) => (
           <div
