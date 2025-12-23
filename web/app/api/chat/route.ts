@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   try {
     const key = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
     if (!key) {
-      console.error("❌ Chave não encontrada");
+      console.error("Chave não encontrada");
       throw new Error("Chave de API ausente");
     }
 
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     return Response.json({ text });
   } catch (error) {
-    console.error("🔥 Erro no Gemini:", error);
+    console.error("Erro no Gemini:", error);
     return Response.json(
       { error: "Erro ao gerar resposta da IA. Verifique os logs." },
       { status: 500 }
